@@ -1,61 +1,82 @@
 #include <stdio.h>
 #include <math.h>
-
+#include <string.h>
+#define N 3
+#define G 6.674e-11
     typedef struct {
         double x, y, z, vx, vy, vz, mass;
     } particle;
 
-    void apply_gravity(particle *a, particle *b, double dt);
+
 int main()
 {
-    particle p1, p2;
-    
-    printf("Particle 1: (x y z vx vy vz mass)\n");
-    scanf(" %lf %lf %lf %lf %lf %lf %lf", &p1.x, &p1.y, &p1.z, &p1.vx, &p1.vy, &p1.vz, &p1.mass);
+    int n = 0;
+    printf("How many Bodies?");
+    scanf("%i", &n);
+    particle bod[n];
+    memset(bod, 0, sizeof(bod));
+    for(int i = 0; i < n; i++){
 
-    printf("Particle 2: (x y z vx vy vz mass)\n");
-    scanf(" %lf %lf %lf %lf %lf %lf %lf", &p2.x, &p2.y, &p2.z, &p2.vx, &p2.vy, &p2.vz, &p2.mass);
+    printf("Particle %d: (x y z vx vy vz mass)\n", i+1);
+    scanf(" %lf %lf %lf %lf %lf %lf %lf", &bod[i].x, &bod[i].y, &bod[i].z, &bod[i].vx, &bod[i].vy, &bod[i].vz, &bod[i].mass);
+
+    }
 
     double dt = 0.1;
     int steps = 100;
-    for(int i = 0; i < steps; i++){
+    for(int p = 0; p < steps; p++){
+        
+double ax[n];
+double ay[n];
+double az[n];
+memset(ax, 0, sizeof(ax));
+memset(ay, 0, sizeof(ay));
+memset(az, 0, sizeof(az));
 
-    
-        apply_gravity(&p1, &p2, dt);
-        printf("P1 velocity: %lf %lf %lf\n", p1.vx, p1.vy, p1.vz);
-        printf("P2 velocity: %lf %lf %lf\n", p2.vx, p2.vy, p2.vz);
-        printf("P1 position: %lf %lf %lf\n", p1.x, p1.y, p1.z);
-        printf("P2 position: %lf %lf %lf\n", p2.x, p2.y, p2.z);
+
+    for(int i = 0; i < n; i++){
+        for(int j = i+1; j < n; j++ ){
+    double dx = bod[j].x - bod[i].x;
+    double dy = bod[j].y - bod[i].y;
+    double dz = bod[j].z - bod[i].z;
+    double dist = sqrt(dx*dx + dy*dy + dz*dz +0.001); //0.001 is the softening factor, keeps objects from colliding
+
+    double force = G * (bod[i].mass * bod[j].mass) / (dist*dist);
+
+    double fx = force * (dx / dist);
+    double fy = force * (dy / dist); //force calculator
+    double fz = force * (dz / dist);
+
+    ax[i] += fx / bod[i].mass;
+    ax[j] -= fx / bod[j].mass;
+    ay[i] += fy / bod[i].mass;
+    ay[j] -= fy / bod[j].mass;
+    az[i] += fz / bod[i].mass;
+    az[j] -= fz / bod[j].mass;
+        }
     }
+    for(int i = 0; i < n; i++){
+    bod[i].vx += ax[i] * dt;
+    bod[i].vy += ay[i] * dt;
+    bod[i].vz += az[i] * dt;
+    bod[i].x += bod[i].vx * dt;
+    bod[i].y += bod[i].vy * dt;
+    bod[i].z += bod[i].vz * dt;
+    }
+    for(int i = 0; i < n; i++){
+        printf("%i velocity: %lf %lf %lf\n", i+1, bod[i].vx, bod[i].vy, bod[i].vz);
+        printf("%i position: %lf %lf %lf\n", i+1, bod[i].x, bod[i].y, bod[i].z);
+        
+    }
+}
+
     return 0;
 
 }
 
-void apply_gravity(particle *a, particle *b, double dt){
-    double dx = b->x - a ->x;
-    double dy = b->y - a ->y;
-    double dz = b->z - a ->z;
-    double dist = sqrt(dx*dx + dy*dy + dz*dz +0.001); //0.001 is the softening factor, keeps objects from colliding
 
-    double G = 6.674e-11;
-    double force = G * (a->mass * b->mass) / (dist*dist);
-
-    double fx = force * (dx / dist);
-    double fy = force * (dy / dist);
-    double fz = force * (dz / dist);
-
-    a->vx += (fx / a->mass) * dt;
-    a->vy += (fy / a->mass) * dt;
-    a->vz += (fz / a->mass) * dt;
-    b->vx -= (fx / b->mass) * dt;
-    b->vy -= (fy / b->mass) * dt;
-    b->vz -= (fz / b->mass) * dt;
-    a->x += a->vx * dt;
-    a->y += a->vy * dt;
-    a->z += a->vz * dt;
-    b->x += b->vx * dt;
-    b->y += b->vy * dt;
-    b->z += b->vz * dt;
     
-}
+
+    
+    
 
