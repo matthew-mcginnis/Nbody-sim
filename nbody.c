@@ -19,19 +19,20 @@ int main()
 
     printf("Particle %d: (x y z vx vy vz mass)\n", i+1);
     scanf(" %lf %lf %lf %lf %lf %lf %lf", &bod[i].x, &bod[i].y, &bod[i].z, &bod[i].vx, &bod[i].vy, &bod[i].vz, &bod[i].mass);
+       }
 
-    }
+    double ax[n];
+    double ay[n];
+    double az[n];
 
     double dt = 0.1;
     int steps = 100;
     for(int p = 0; p < steps; p++){
         
-double ax[n];
-double ay[n];
-double az[n];
-memset(ax, 0, sizeof(ax));
-memset(ay, 0, sizeof(ay));
-memset(az, 0, sizeof(az));
+
+    memset(ax, 0, sizeof(ax));
+    memset(ay, 0, sizeof(ay));
+    memset(az, 0, sizeof(az));
 
 
     for(int i = 0; i < n; i++){
@@ -39,7 +40,7 @@ memset(az, 0, sizeof(az));
     double dx = bod[j].x - bod[i].x;
     double dy = bod[j].y - bod[i].y;
     double dz = bod[j].z - bod[i].z;
-    double dist = sqrt(dx*dx + dy*dy + dz*dz +0.001); //0.001 is the softening factor, keeps objects from colliding
+    double dist = sqrt(dx*dx + dy*dy + dz*dz + 0.001*0.001); //0.001 is the softening factor, keeps objects creating numerical singularities
 
     double force = G * (bod[i].mass * bod[j].mass) / (dist*dist);
 
